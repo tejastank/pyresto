@@ -19,6 +19,8 @@ def get_file_contents(file_path):
     full_path = os.path.join(package_directory, file_path)
     return open(full_path, 'r').read()
 
+install_requirements = open('requirements/requirements.txt').read().split()
+
 setup(
     name=pyresto.__title__,
     version=pyresto.__version__,
@@ -29,8 +31,11 @@ setup(
     url='https://github.com/BYK/pyresto',
     packages=[
         'pyresto',
-        'pyresto.apis'
+        'pyresto.apis',
+        'pyresto.apis.github',
+        'pyresto.apis.bugzilla',
     ],
+    install_requires=install_requirements,
     license='Mozilla Public License, v. 2.0',
     classifiers=(
         'Development Status :: 4 - Beta',

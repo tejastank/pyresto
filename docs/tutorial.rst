@@ -6,7 +6,7 @@ Tutorial
 .. module:: pyresto
 
 Welcome to the pyresto tutorial. This tutorial will guide you about how the
-:mod:`apis.GitHub` module is implemented.
+:mod:`pyresto.apis.github` module is implemented.
 
 
 The Base
@@ -16,8 +16,8 @@ Start off by creating a base model class for the service you are using which
 will hold the common values such as the API host, the common model
 representation using ``__repr__`` etc:
 
-.. literalinclude:: ../pyresto/apis/github/__init__.py
-    :lines: 6-13
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 20-31
 
 
 Simple Models
@@ -26,8 +26,8 @@ Simple Models
 Then continue with implementing simple models which does not refer to any other
 model, such as the ``Comment`` model for GitHub:
 
-.. literalinclude:: ../pyresto/apis/github/__init__.py
-    :lines: 16-18
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 34-37
 
 
 Note that we didn't define *any* attributes except for the mandatory ``_path``
@@ -46,8 +46,8 @@ Relations
 After defining some "simple" models, you can start implementing models having
 relations with each other:
 
-.. literalinclude:: ../pyresto/github/__init__.py
-    :lines: 21-24
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 39-42
 
 Note that we used the attribute name ``comments`` which will "shadow" any
 attribute named "comments" sent by the server as documented in
@@ -73,8 +73,8 @@ from the ``Link`` header. See
 If we were expecting lots of items to be in the collection, or an unknown
 number of items in the collection, we could have used ``lazy=True`` like this:
 
-.. literalinclude:: ../pyresto/apis/github/__init__.py
-    :lines: 41-47
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 64-72
 
 Using ``lazy=True`` will result in a :class:`LazyList<.core.LazyList>` type of
 field on the model when accessed, which is basically a generator. So you can
@@ -84,8 +84,8 @@ get the total length of the collection.
 You can also use the :class:`Foreign<.core.Foreign>` relation to refer to
 other models:
 
-.. literalinclude:: ../pyresto/apis/github/__init__.py
-    :lines: 35-38
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 53-56
 
 When used in its simplest form, just like in the code above, this relation
 expects the primary key value for the model it is referencing, ``Commit`` here,
@@ -104,6 +104,34 @@ Since all relation types expect the class object itself for relations, it is
 not always possible to put all relation definitons inside the class definition.
 For those cases, you can simply late bind the relations as follows:
 
-.. literalinclude:: ../pyresto/apis/github/__init__.py
-    :lines: 56-61
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 92-100
+
+
+Authentication
+--------------
+
+Most services require authentication even for only fetching data so providing
+means of authentication is essential. Define the possible authentication
+mechanisms for the service:
+
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 3,8-17,102-103
+
+Make sure you use the provided authentication classes by :mod:`requests.auth`
+if they suit your needs. If you still need a custom authentication class, make
+sure you derive it from :class:`Auth<.core.Auth>`.
+
+After defining the authentication methods, create a module-global function that
+will set the default authentication method and credentials for all requests for
+convenience:
+
+.. literalinclude:: ../pyresto/apis/github/models.py
+    :lines: 105-106
+
+Above, we provide the list of methods/classes we have previously defined, the
+base class for our service since all other models inherit from that and will
+use the authentication defined on that, unless overridden. And we also set our
+default authentication mechanism to remove the burden from the shoulders of the
+users of our API library.
 
